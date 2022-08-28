@@ -67,6 +67,7 @@ resource "aws_internet_gateway" "main_igw" {
     Name = "main_igw"
   }
 }
+
 # Creates route table for main VPC
 resource "aws_route_table" "main_rt" {
   vpc_id = aws_vpc.main_vpc.id
@@ -93,7 +94,7 @@ resource "aws_route_table_association" "subnet-rt-pubB" {
   route_table_id = aws_route_table.main_rt.id
 }
 
-# Creates public security group for the static web hosted EC2 instance
+# Creates security group for public access to the EC2 instance hosting the apache web server
 resource "aws_security_group" "web_sg" {
   name        = "web_sg"
   description = "Web Security Group"
@@ -124,10 +125,9 @@ resource "aws_instance" "static_website" {
 #!/bin/bash
 yum update -y
 yum install -y httpd.x86_64
-systemctl start httpd.service 
-systemctl enable httpd.service
-echo “Hello World from $(hostname -f)” > /var/www/html/index.html"
-
+sudo systemctl start httpd.service 
+sudo systemctl enable httpd.service
+sudo echo “Hello World” > /var/www/html/index.html"
 EOF
   tags = {
     Name = "static_website"
