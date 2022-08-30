@@ -44,6 +44,8 @@ resource "aws_subnet" "public_b" {
     Name = "public_b"
   }
 }
+
+# The private subnets are not used today
 resource "aws_subnet" "private_a" {
   vpc_id     = aws_vpc.main_vpc.id
   cidr_block = "10.0.2.0/24"
@@ -68,7 +70,7 @@ resource "aws_internet_gateway" "main_igw" {
   }
 }
 
-# Creates route table for main VPC
+# Creates route table for the main VPC
 resource "aws_route_table" "main_rt" {
   vpc_id = aws_vpc.main_vpc.id
   route {
@@ -94,7 +96,7 @@ resource "aws_route_table_association" "subnet-rt-pubB" {
   route_table_id = aws_route_table.main_rt.id
 }
 
-# Creates security group for public access to the EC2 instance hosting the apache web server
+# Creates security group for public access to the EC2 instance hosting the apache web server and static web content
 resource "aws_security_group" "web_sg" {
   name        = "web_sg"
   description = "Web Security Group"
