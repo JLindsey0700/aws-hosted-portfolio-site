@@ -1,28 +1,12 @@
-# Configure the AWS Provider
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 4.0"
-    }
-  }
-}
-
-provider "aws" {
-  region = "us-east-1"
-  shared_credentials_files = ["/home/james/.aws/credentials"]
-  profile = "iamadmin"
-}
-
-
 # Creates an EC2 instance which will host the static web site
 resource "aws_instance" "static_website" {
   ami = "ami-05fa00d4c63e32376"
   instance_type = "t2.micro"
-  subnet_id = aws_subnet.public_a.id
+  subnet_id = aws_subnet.public_a.id        # Instance is placed in public subnet a 
   vpc_security_group_ids = [aws_security_group.web_sg.id]
   key_name = "staticwebserver"
-  # Bootstrapping the EC2 instance with apache webserver, running systemctl manually with sudo seems to make it work
+  # Bootstrapping the EC2 instance with apache webserver
+  iam_instance_profile = aws_iam_instance_profile.webserver_role.name
   user_data = <<EOF
 #!/bin/bash
 yum update -y
@@ -34,4 +18,10 @@ EOF
   tags = {
     Name = "static_website"
   }
+}
+
+
+resource "aws_iam_instance_profile" "webserver_role" {
+  name = "ec2_role_access_s3"
+  role = aws_iam_role.ec2_iam_role.name
 }
