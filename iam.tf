@@ -16,36 +16,26 @@ resource "aws_iam_role" "ec2_iam_role" {
       },
     ]
   })
-
   tags = {
     tag-key = "ec2_role"
   }
-}
-
-resource "aws_iam_role_policy" "ec2_role_policy" {
-  name = "test_policy"
+} 
+ resource "aws_iam_role_policy" "ec2_role_policy" {
+  name = "ec2_role_policy"
   role = aws_iam_role.ec2_iam_role.id
 
   # Terraform's "jsonencode" function converts a
   # Terraform expression result to valid JSON syntax.
-  policy = <<EOF
-  { 
-    "Version" = "2012-10-17"
-    "Statement" = [
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
       {
-        "Effect" = "Allow"
-        "Action": [
+        Action = [
           "s3:*",
         ]
-        "Effect"   = "Allow"
-        "Resource" = "arn:aws:s3:::web-files-2343"
+        Effect   = "Allow"
+        Resource = "*"
       },
-      {
-        "Effect" = "Allow"
-        "Action" = "s3.ListAllMyBuckets"
-        "Resource" = "arn:aws:s3:::*"
-      }
     ]
-    EOF
-  }
-  
+  })
+}
