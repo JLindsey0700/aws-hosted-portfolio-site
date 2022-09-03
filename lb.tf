@@ -1,7 +1,7 @@
-/*
+
 # Creates an instance target group which are used to route requests to one or more registered targets.
 resource "aws_lb_target_group" "web_server_tg" {
-  name     = "target_group_web_server"
+  name     = "TargetGroup"
   port     = 80
   protocol = "HTTP"
   vpc_id   = aws_vpc.main_vpc.id
@@ -15,14 +15,15 @@ resource "aws_lb_target_group" "web_server_tg" {
     unhealthy_threshold = "2"   
   }
 }
+
 # Creates an application load balancer
 resource "aws_lb" "application_lb" {
-    name = "web_server_load_balancer"
+    name = "WebServerLoadBalancer"
     internal = "false"
     ip_address_type = "ipv4"
     load_balancer_type = "application"
     security_groups = [aws_security_group.web_sg.id]
-    subnets = data.aws_subnet_ids.subnet.ids
+    subnets = [aws_subnet.public_a.id, aws_subnet.public_b.id]
 }
 
 resource "aws_lb_listener" "web_alb_listener" {
@@ -35,8 +36,10 @@ resource "aws_lb_listener" "web_alb_listener" {
     }
 }
 
-resource "aws_lb_target_group_attachment" "ec2_lb_attach" {
-    count = 
-  
+resource "aws_lb_target_group_attachment" "lb_targetgroup_attachment" {
+  target_group_arn = aws_lb_target_group.web_server_tg.arn
+  target_id        = aws_instance.static_website.id
+  port             = 80
 }
-*/
+
+
