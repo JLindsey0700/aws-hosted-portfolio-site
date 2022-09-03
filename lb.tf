@@ -1,4 +1,3 @@
-
 # Creates an instance target group which are used to route requests to one or more registered targets.
 resource "aws_lb_target_group" "web_server_tg" {
   name     = "TargetGroup"
@@ -25,7 +24,7 @@ resource "aws_lb" "application_lb" {
     security_groups = [aws_security_group.web_sg.id]
     subnets = [aws_subnet.public_a.id, aws_subnet.public_b.id]
 }
-
+# Configures the lb listener to HTTP port 80 listening for the web server target group
 resource "aws_lb_listener" "web_alb_listener" {
     load_balancer_arn = aws_lb.application_lb.arn
     port = 80
@@ -35,11 +34,3 @@ resource "aws_lb_listener" "web_alb_listener" {
       type = "forward"
     }
 }
-
-resource "aws_lb_target_group_attachment" "lb_targetgroup_attachment" {
-  target_group_arn = aws_lb_target_group.web_server_tg.arn
-  target_id        = aws_instance.static_website.id
-  port             = 80
-}
-
-
