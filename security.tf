@@ -1,5 +1,4 @@
-# Creates security group for public access to the EC2 instance hosting the apache web server and static web content
-
+# Creates Security Group for HTTP, HTTPS, & SSH ingress traffic to the instances hosting Apache, and allows all egress traffic
 resource "aws_security_group" "web_sg" {
   name        = "Web SG"
   description = "Security Group for instance web traffic"
@@ -36,7 +35,7 @@ resource "aws_security_group" "web_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
+# Creates Security Group for HTTP & HTTPS ingress traffic to the application load balancer, and allows all egress traffic
 resource "aws_security_group" "lb_sg" {
   name        = "Load Balancer SG"
   description = "Security Group for load balancer"
