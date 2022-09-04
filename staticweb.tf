@@ -23,13 +23,8 @@ EOF
 }
 */
 
-# Assings the prefined ec2 role to the ec2 iam instance profile which is assigned to the web server
-resource "aws_iam_instance_profile" "webserver_role" {
-  name = "ec2_role_access_s3"
-  role = aws_iam_role.ec2_iam_role.name
-}
 
-
+/*
 # Create an EFS, web files will be stored & the storage will be mounted to the instances running apache. 
 resource "aws_efs_file_system" "efs_webfiles" {
   creation_token = "efs_web_server_files"
@@ -39,7 +34,6 @@ resource "aws_efs_file_system" "efs_webfiles" {
   }
 }
 
-/*
 resource "aws_efs_mount_target" "mount" {
   file_system_id = aws_efs_file_system.efs_webfiles.id
   subnet_id      = aws_subnet.public_a.id

@@ -1,55 +1,55 @@
 # Creates the main VPC 
 resource "aws_vpc" "main_vpc" {
-  cidr_block       = "10.0.0.0/16"
+  cidr_block       = var.vpc_cidr
   instance_tenancy = "default"
   enable_dns_hostnames = true
   tags = {
-    Name = "main_vpc"  
+    Name = "Main VPC"  
 }
 }
 
 # Creates two public and private subnets
 resource "aws_subnet" "public_a" {
   vpc_id     = aws_vpc.main_vpc.id
-  cidr_block = "10.0.0.0/24"
-  availability_zone = "us-east-1a"
+  cidr_block = var.pub_a_cidr
+  availability_zone = var.availability_zone_a
   map_public_ip_on_launch = true
   tags = {
-    Name = "public_a"
+    Name = "Public A"
   }
 }
 resource "aws_subnet" "public_b" {
   vpc_id     = aws_vpc.main_vpc.id
-  cidr_block = "10.0.1.0/24"
-  availability_zone = "us-east-1b"
+  cidr_block = var.pub_b_cidr
+  availability_zone = var.availability_zone_b
   map_public_ip_on_launch = true
     tags = {
-    Name = "public_b"
+    Name = "Public B"
   }
 }
 
 # The private subnets are not used today
 resource "aws_subnet" "private_a" {
   vpc_id     = aws_vpc.main_vpc.id
-  cidr_block = "10.0.2.0/24"
-  availability_zone = "us-east-1a"
+  cidr_block = var.priv_a_cidr
+  availability_zone = var.availability_zone_a
   tags = {
-    Name = "private_a"
+    Name = "Private A"
   }
 }
 resource "aws_subnet" "private_b" {
   vpc_id     = aws_vpc.main_vpc.id
-  cidr_block = "10.0.3.0/24"
-  availability_zone = "us-east-1b"
+  cidr_block = var.priv_b_cidr
+  availability_zone = var.availability_zone_b
   tags = {
-    Name = "private_b"
+    Name = "Private B"
   }
 }
 # Creates IGW in main VPC
 resource "aws_internet_gateway" "main_igw" {
   vpc_id = aws_vpc.main_vpc.id
   tags = {
-    Name = "main_igw"
+    Name = "Main IGW"
   }
 }
 
@@ -61,7 +61,7 @@ resource "aws_route_table" "main_rt" {
     gateway_id = aws_internet_gateway.main_igw.id
   }
   tags = {
-    Name = "main_RT"
+    Name = "Main RT"
   }
 }
 # Assosiates main rt with the main vpc
@@ -77,23 +77,4 @@ resource "aws_route_table_association" "subnet-rt-pubA" {
 resource "aws_route_table_association" "subnet-rt-pubB" {
   subnet_id      = aws_subnet.public_b.id
   route_table_id = aws_route_table.main_rt.id
-}
-
-# Creates security group for public access to the EC2 instance hosting the apache web server and static web content
-resource "aws_security_group" "web_sg" {
-  name        = "web_sg"
-  description = "Web Security Group"
-  vpc_id = aws_vpc.main_vpc.id
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol = -1
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol = -1
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 }
