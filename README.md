@@ -1,7 +1,7 @@
 # AWS Hosted Portfolio Site
 
 ## Objective
-The goal of this project is to host my personal portfolio website page on AWS. The site can be accessed via [jameslindsey.link](jameslindsey.link)
+The goal of this project is to host my personal portfolio website page on AWS. The site can be accessed via [jameslindsey.link](http://jameslindsey.link)
 
 ## Alternatives
 There are many simplier way to host a basic static website, I could have uploaded my web content to S3, or even used GitHub Pages. The aim of the project was to test myself to deploy a highly available, performant web server that could scale based on the resource utilization, and could survive the failure of an underlying infrastructure component, and  could be intergrated with my own registered domain name.
