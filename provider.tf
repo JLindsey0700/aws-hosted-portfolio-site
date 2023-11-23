@@ -3,7 +3,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.0"
+      version = "~> 5.0"
     }
   }
 }
@@ -11,6 +11,7 @@ terraform {
 # Configure the AWS Provider
 provider "aws" {
   region = var.region
-  shared_credentials_files = ["/home/james/.aws/credentials"]
+  # Uses a shared credentials file to authenticate with AWS, ensures access credentials do not get made public by hard coding them.
+  shared_credentials_files = ["/home/james/.aws/credentials"] # 
   profile = "iamadmin"
 }
