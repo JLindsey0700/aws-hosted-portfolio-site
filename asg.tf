@@ -38,3 +38,20 @@ resource "aws_autoscaling_attachment" "asg_attachment_elb" {
   autoscaling_group_name = aws_autoscaling_group.ASG_Group.id
   lb_target_group_arn = aws_lb_target_group.web_server_tg.arn
 }
+
+resource "aws_autoscaling_policy" "cpu_utilization" {
+  name                   = "cpu-utilization-scaling-policy"
+  adjustment_type         = "ChangeInCapacity"
+  autoscaling_group_name  = aws_autoscaling_group.ASG_Group.name
+
+  metric_aggregation_type = "Average"
+  policy_type             = "TargetTrackingScaling"
+
+  # Scaling based on CPU utilization
+  target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ASGAverageCPUUtilization" # Calculates the average CPU utilization across instances in the ASG
+    }
+    target_value = 50 # Specifies desired target CPU utilization percentage
+  }
+}
