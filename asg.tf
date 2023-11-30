@@ -1,12 +1,12 @@
 resource "aws_autoscaling_group" "ASG_Group" {
   name                      = "Web ASG"
-  depends_on = [aws_launch_configuration.Web_LT]  # This ASG explicitly depend on the launch config referenced below, so this line needs be added to avoid errors
+  depends_on = [aws_launch_configuration.Web_LT]  # ASG explicitly depends on the launch config referenced below, this line needs be added to avoid errors
   max_size                  = 4
   min_size                  = 2
   health_check_grace_period = 60
   health_check_type         = "ELB"
   desired_capacity          = 2
-  force_delete              = true
+  force_delete              = true # Allows deleting the ASG without waiting for all instances to terminate.
   launch_configuration      = aws_launch_configuration.Web_LT.id
   vpc_zone_identifier       = [aws_subnet.private_a.id, aws_subnet.private_b.id]
 }
@@ -17,11 +17,9 @@ resource "aws_launch_configuration" "Web_LT" {
   instance_type        = var.linux_instance_type
   iam_instance_profile = aws_iam_instance_profile.webserver_role.name # Attach IAM role to EC2 instance
   security_groups      = [aws_security_group.web_sg.id]  # Attach Web SG
-  key_name             = "private_web_keypair"
+  associate_public_ip_address = false # No public IP required as instances are launched in private subnets
 
-  associate_public_ip_address = false
-
-  #Bash script installs  Apache webserver, starts Apache, ensures it starts on system boot, then copies website files from an S3 bucket to document root directory 
+  # Bash script installs Apache webserver, starts Apache, ensures it starts on system boot, then copies website files from an S3 bucket to document root directory 
   user_data          = <<EOF
 #!/bin/bash
 yum update -y                         
@@ -31,7 +29,7 @@ sudo systemctl enable httpd.service
 sudo aws s3 cp s3://web-files-2343/ /var/www/html/ --recursive   
 EOF
   lifecycle {
-    create_before_destroy = true
+    create_before_destroy = true # Ensure a new launch configuration is created before destroying the existing one during updates or modifications
   }
 }
 

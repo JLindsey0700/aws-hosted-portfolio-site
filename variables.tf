@@ -1,50 +1,48 @@
 variable "region" {
   type = string
+  description = "AWS region"
   default = "us-east-1"
 }
 
 variable "vpc_cidr" {
     type = string
+    description = "CIDR range for VPC"
     default = "10.0.0.0/16"
 }
 
 variable "pub_a_cidr" {
     type = string
+    description = "CIDR range for public subnet a"
     default = "10.0.0.0/24"
 }
 
 variable "pub_b_cidr" {
     type = string
+    description = "CIDR range for public subnet b"
     default = "10.0.1.0/24"
 }
 
 variable "priv_a_cidr" {
     type = string
+    description = "CIDR range for private subnet a"
     default = "10.0.2.0/24"
 }
 
 variable "priv_b_cidr" {
     type = string
+    description = "CIDR range for private subnet b"
     default = "10.0.3.0/24"
-}
-
-variable "bastion_private_ip" {
-    type = string
-    default = "10.0.0.4"
-}
-
-variable "bastion_eip_allocation_id" {
-    type = string
-    default = "eipalloc-06f1fce47ef962737"
 }
 
 variable "availability_zone_a" {
   type = string
+  description = "Availabilty zone for AZ-A"
   default = "us-east-1a"
 }
 
 variable "availability_zone_b" {
   type = string
+  description = "Availabilty zone for AZ-B"
   default = "us-east-1b"
 }
 
@@ -56,14 +54,13 @@ variable "linux_instance_type" {
 
 variable "web_server_ami" {
   type        = string
-  description = "ami ID"
+  description = "Ami ID for launch configuration"
   default     = "ami-05fa00d4c63e32376"
 }
 
 variable "domain_name" {
   type        = string
-  description = "domain name"
+  description = "Registered domain name"
   default     = "jameslindsey.link"
 }
-
 
