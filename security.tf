@@ -1,4 +1,4 @@
-# Creates Security Group for HTTP, HTTPS, & SSH ingress traffic to the instances hosting Apache, and allows all egress traffic
+# Creates Security Group for HTTP, HTTPS ingress traffic to the instances hosting Apache, and allows all egress traffic
 resource "aws_security_group" "web_sg" {
   name        = "Web SG"
   description = "Security Group for instance web traffic"
@@ -19,7 +19,8 @@ resource "aws_security_group" "web_sg" {
     cidr_blocks = ["0.0.0.0/0"]
     description = "Allow incoming HTTPS connections"
   }  
-  
+
+/*  
   ingress {
     from_port   = 22
     to_port     = 22
@@ -27,7 +28,8 @@ resource "aws_security_group" "web_sg" {
     cidr_blocks = ["0.0.0.0/0"]
     description = "Allow incoming SSH connections"
   }  
-  
+  */
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -67,21 +69,20 @@ resource "aws_security_group" "lb_sg" {
 
 resource "aws_security_group" "ssm_endpoint_sg" {
   name        = "ssm-endpoint-sg"
-  description = "Security group for Systems Manager VPC endpoint"
+  description = "Security group for VPC endpoints for SSM"
 
-  vpc_id = aws_vpc.main_vpc.id  # Replace with your VPC ID
+  vpc_id = aws_vpc.main_vpc.id 
 
-  // Inbound rules to allow communication with Systems Manager service
-  // You might need to adjust these rules based on your specific requirements
+  # Inbound rules to allow communication with Systems Manager service
   ingress {
-    from_port   = 443  # Adjust ports as necessary
+    from_port   = 443 
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # Allow inbound traffic from all IPv4 addresses
+    cidr_blocks = ["0.0.0.0/0"]  # Allows inbound traffic from all IPv4 addresses
     description = "Inbound traffic for Systems Manager"
   }
 
-  // Outbound rule allowing responses from Systems Manager to the endpoint
+  # Outbound rule allowing responses from Systems Manager to the endpoint
   egress {
     from_port   = 443
     to_port     = 443
