@@ -15,7 +15,7 @@ resource "aws_lb_target_group" "web_server_tg" {
   }
 }
 
-# Creates an application load balancer
+# Creates an application load balancer (ALB)
 resource "aws_lb" "web_lb" {
     name = "WebLB"
     internal = "false"
@@ -24,7 +24,8 @@ resource "aws_lb" "web_lb" {
     security_groups = [aws_security_group.lb_sg.id]
     subnets = [aws_subnet.public_a.id, aws_subnet.public_b.id]
 }
-# Configures the lb listener to HTTP port 80 listening for the web server target group
+
+# Creates an ALB listener on port 80 that listens for incoming HTTP traffic, and forwards it to the target group
 resource "aws_lb_listener" "web_alb_listener" {
     load_balancer_arn = aws_lb.web_lb.arn
     port = 80

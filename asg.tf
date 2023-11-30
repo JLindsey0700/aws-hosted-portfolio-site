@@ -1,28 +1,32 @@
-
 resource "aws_autoscaling_group" "ASG_Group" {
   name                      = "Web ASG"
-  # We want this to explicitly depend on the launch config above
-  depends_on = [aws_launch_configuration.Web_LT]
-  max_size                  = 2
-  min_size                  = 1
+  depends_on = [aws_launch_configuration.Web_LT]  # This ASG explicitly depend on the launch config referenced below, so this line needs be added to avoid errors
+  max_size                  = 4
+  min_size                  = 2
   health_check_grace_period = 60
   health_check_type         = "ELB"
-  desired_capacity          = 1
+  desired_capacity          = 2
   force_delete              = true
   launch_configuration      = aws_launch_configuration.Web_LT.id
-  vpc_zone_identifier       = [aws_subnet.public_a.id, aws_subnet.public_b.id]
+  vpc_zone_identifier       = [aws_subnet.private_a.id, aws_subnet.private_b.id]
 }
+
 resource "aws_launch_configuration" "Web_LT" {
-  name          = "Web LT"
-  image_id      =  var.web_server_ami
-  instance_type = var.linux_instance_type
-  iam_instance_profile = aws_iam_instance_profile.webserver_role.name # Attach S3 role to EC2 Instance
-  security_groups    = [aws_security_group.web_sg.id]  # Attach Web SG
+  name                 = "Web LT"
+  image_id             =  var.web_server_ami
+  instance_type        = var.linux_instance_type
+  iam_instance_profile = aws_iam_instance_profile.webserver_role.name # Attach IAM role to EC2 instance
+  security_groups      = [aws_security_group.web_sg.id]  # Attach Web SG
+  key_name             = "private_web_keypair"
+
+  associate_public_ip_address = false
+
+  #Bash script installs  Apache webserver, starts Apache, ensures it starts on system boot, then copies website files from an S3 bucket to document root directory 
   user_data          = <<EOF
 #!/bin/bash
 yum update -y                         
 yum install -y httpd.x86_64           
-sudo systemctl start httpd.service    
+sudo systemctl start httpd.service  
 sudo systemctl enable httpd.service
 sudo aws s3 cp s3://web-files-2343/ /var/www/html/ --recursive   
 EOF
@@ -30,13 +34,9 @@ EOF
     create_before_destroy = true
   }
 }
+
+#Attachs the ASG and the target group within the ALB
 resource "aws_autoscaling_attachment" "asg_attachment_elb" {
   autoscaling_group_name = aws_autoscaling_group.ASG_Group.id
   lb_target_group_arn = aws_lb_target_group.web_server_tg.arn
-}
-
-# Assings the prefined ec2 role to the ec2 iam instance profile which is assigned to the web server
-resource "aws_iam_instance_profile" "webserver_role" {
-  name = "ec2_role_access_s3"
-  role = aws_iam_role.ec2_iam_role.name
 }

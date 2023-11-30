@@ -1,4 +1,3 @@
-# Configure the AWS Provider
 terraform {
   required_providers {
     aws = {
@@ -11,7 +10,7 @@ terraform {
 # Configure the AWS Provider
 provider "aws" {
   region = var.region
-  # Uses a shared credentials file to authenticate with AWS, ensures access credentials do not get made public by hard coding them.
+  # Uses a shared credentials file to authenticate with AWS, which ensures access credentials do not get made public
   shared_credentials_files = ["/home/james/.aws/credentials"] # 
   profile = "iamadmin"
 }

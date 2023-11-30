@@ -1,5 +1,5 @@
 resource "aws_iam_role" "ec2_iam_role" {
-  name = "ec2_role_s3"
+  name = "EC2_IAM_role"
 
   # Terraform's "jsonencode" function converts a
   # Terraform expression result to valid JSON syntax.
@@ -20,12 +20,63 @@ resource "aws_iam_role" "ec2_iam_role" {
     tag-key = "ec2_role"
   }
 } 
- resource "aws_iam_role_policy" "ec2_role_policy" {
-  name = "ec2_role_policy"
-  role = aws_iam_role.ec2_iam_role.id
+#Defines the IAM policy to allow SSM to be used to manage the EC2
+resource "aws_iam_policy" "SSM_policy" {
+  name        = "SSM_policy"
+  description = "Policy allowing access to SSM"
 
-  # Terraform's "jsonencode" function converts a
-  # Terraform expression result to valid JSON syntax.
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ssm:DescribeAssociation",
+                "ssm:GetDeployablePatchSnapshotForInstance",
+                "ssm:GetDocument",
+                "ssm:DescribeDocument",
+                "ssm:GetManifest",
+                "ssm:ListAssociations",
+                "ssm:ListInstanceAssociations",
+                "ssm:PutInventory",
+                "ssm:PutComplianceItems",
+                "ssm:PutConfigurePackageResult",
+                "ssm:UpdateAssociationStatus",
+                "ssm:UpdateInstanceAssociationStatus",
+                "ssm:UpdateInstanceInformation"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ssmmessages:CreateControlChannel",
+                "ssmmessages:CreateDataChannel",
+                "ssmmessages:OpenControlChannel",
+                "ssmmessages:OpenDataChannel"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2messages:AcknowledgeMessage",
+                "ec2messages:DeleteMessage",
+                "ec2messages:FailMessage",
+                "ec2messages:GetEndpoint",
+                "ec2messages:GetMessages",
+                "ec2messages:SendReply"
+            ],
+            "Resource": "*"
+        }
+    ]
+  })
+}
+#Defines the IAM policy to allow S3 to be accessed, need to refine to particular buckets and actions to improve security posture
+resource "aws_iam_policy" "S3_policy" {
+  name        = "S3_policy"
+  description = "Policy allowing access to S3"
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -38,4 +89,23 @@ resource "aws_iam_role" "ec2_iam_role" {
       },
     ]
   })
+}
+
+#Attaches SSM policy to EC2 IAM role
+resource "aws_iam_policy_attachment" "SSM_policy_attachment" {
+  name       = "SSM_policy_attachment"
+  roles      = [aws_iam_role.ec2_iam_role.name]
+  policy_arn = aws_iam_policy.SSM_policy.arn
+}
+#Attaches S3 policy to EC2 IAM role
+resource "aws_iam_policy_attachment" "S3_policy_attachment" {
+  name       = "S3_policy_attachment" 
+  roles      = [aws_iam_role.ec2_iam_role.name]
+  policy_arn = aws_iam_policy.S3_policy.arn
+}
+
+# Assings the prefined ec2 role to the ec2 iam instance profile which is assigned to the web server
+resource "aws_iam_instance_profile" "webserver_role" {
+  name = "ec2_role_access_s3"
+  role = aws_iam_role.ec2_iam_role.name
 }

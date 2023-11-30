@@ -1,53 +1,14 @@
-/*
-resource "aws_route53_zone" "primary" {
-  name = "jameslindsey.link"
+# Imports the information from a prior created hosted zone for a domain already registered in AWS Route53
+data "aws_route53_zone" "hosted_zone" {
+  name = var.domain_name # root domain name
 }
 
-resource "aws_route53_record" "www" {
-  zone_id = aws_route53_zone.primary.zone_id
-  name    = "Portfolio_Site"
+#Creates an Alias (A) record in the imported DNS hosted zone, pointing the domain name to the DNS name of the ALB
+resource "aws_route53_record" "A_record" {
+  zone_id = data.aws_route53_zone.hosted_zone.zone_id
+  name    = var.domain_name  # root domain name
   type    = "A"
-
-  alias {
-    name                   = aws_lb.web_lb.dns_name
-    zone_id                = aws_lb.web_lb.zone_id
-    evaluate_target_health = true
-  }
-}
-
-resource "aws_route53_record" "www" {
-  zone_id = aws_route53_zone.primary.zone_id
-  name    = "Portfolio_Site"
-  type    = "A"
-  ttl     = 300
-  records = [aws_lb.web_lb.dns_name]
-}
-resource "aws_route53_record" "www" {
-  zone_id = aws_route53_zone.primary.zone_id
-  name    = "WebLB-1283436870.us-east-1.elb.amazonaws.com"
-  type    = "A"
-  ttl     = 300
-  records = [aws_lb.web_lb.id]
-}
-
-
-
-
-resource "aws_route53_record" "www" {
-  zone_id = aws_route53_zone.primary.zone_id
-  name    = "WebLB-1283436870.us-east-1.elb.amazonaws.com"
-  type    = "A"
-  ttl     = 300
-  records = []
-}
-*/
-
-# Adds A records for the ALB 
-resource "aws_route53_record" "www" {
-  zone_id = aws_route53_zone.primary.zone_id
-  name    = "jameslindsey.link"
-  type    = "A"
-
+ 
   alias {
     name                   = aws_lb.web_lb.dns_name
     zone_id                = aws_lb.web_lb.zone_id
@@ -55,20 +16,19 @@ resource "aws_route53_record" "www" {
   }
 }
 
-#Creates the R53 zone for jameslindsey.link
-resource "aws_route53_zone" "primary" {
-  name = "jameslindsey.link"
-}
-
-
-# Adds NS records for the NS assosiated with the registered domain to the R53 Zone
-resource "aws_route53_record" "ns" {
+/*
+resource "aws_route53_record" "NS_record" {
   allow_overwrite = true
-  name            = "jameslindsey.link"
-  ttl             = 172800
+  name            = var.domain_name
+  ttl             = 60
   type            = "NS"
-  zone_id         = aws_route53_zone.primary.zone_id
-
-  records = ["ns-542.awsdns-03.net", "ns-1238.awsdns-26.org", "ns-1693.awsdns-19.co.uk", "ns-468.awsdns-58.com"]
+  zone_id         = aws_route53_zone.hosted_zone.zone_id
+  # Manually setting the NS records in the  hosted zone, if not specfied the NS' will be chosen automatically and will not match the NS with the registrar
+  records = [
+    "ns-604.awsdns-11.net.",
+    "ns-381.awsdns-47.com.",
+    "ns-1223.awsdns-24.org.",
+    "ns-1653.awsdns-14.co.uk.",
+  ]
 }
-
+*/

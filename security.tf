@@ -65,4 +65,28 @@ resource "aws_security_group" "lb_sg" {
   }
 }
 
+resource "aws_security_group" "ssm_endpoint_sg" {
+  name        = "ssm-endpoint-sg"
+  description = "Security group for Systems Manager VPC endpoint"
 
+  vpc_id = aws_vpc.main_vpc.id  # Replace with your VPC ID
+
+  // Inbound rules to allow communication with Systems Manager service
+  // You might need to adjust these rules based on your specific requirements
+  ingress {
+    from_port   = 443  # Adjust ports as necessary
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # Allow inbound traffic from all IPv4 addresses
+    description = "Inbound traffic for Systems Manager"
+  }
+
+  // Outbound rule allowing responses from Systems Manager to the endpoint
+  egress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # Allow outbound traffic to all IPv4 addresses
+    description = "Outbound traffic for Systems Manager"
+  }
+}

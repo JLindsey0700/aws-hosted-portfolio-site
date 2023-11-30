@@ -28,7 +28,7 @@ resource "aws_subnet" "public_b" {
   }
 }
 
-# The private subnets are not used today
+# The private subnets are not used today, but may come in handy at a later date for private database or app servers
 resource "aws_subnet" "private_a" {
   vpc_id     = aws_vpc.main_vpc.id
   cidr_block = var.priv_a_cidr
@@ -64,12 +64,12 @@ resource "aws_route_table" "main_rt" {
     Name = "Main RT"
   }
 }
-# Assosiates main rt with the main vpc
+# Assosiates main RT with the VPC
 resource "aws_main_route_table_association" "rt_association" {
   vpc_id         = aws_vpc.main_vpc.id
   route_table_id = aws_route_table.main_rt.id
 }
-# Assosiates the subnets with the route table
+# Assosiates the public subnets with the route table
 resource "aws_route_table_association" "subnet-rt-pubA" {
   subnet_id      = aws_subnet.public_a.id
   route_table_id = aws_route_table.main_rt.id
