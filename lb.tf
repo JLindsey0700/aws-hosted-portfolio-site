@@ -1,4 +1,4 @@
-# Creates an instance target group which are used to route requests to one or more registered targets.
+# Creates an instance target group which is used to route requests to targets.
 resource "aws_lb_target_group" "web_server_tg" {
   name     = "Web"
   port     = 80
@@ -6,16 +6,15 @@ resource "aws_lb_target_group" "web_server_tg" {
   vpc_id   = aws_vpc.main_vpc.id
   target_type = "instance"
   health_check {
-    interval = 10
+    interval = 30
     path = "/"
     protocol = "HTTP"
     timeout = "5"
-    healthy_threshold = "5"
+    healthy_threshold = "4"
     unhealthy_threshold = "2"   
   }
 }
 
-# Creates an application load balancer (ALB)
 resource "aws_lb" "web_lb" {
     name = "WebLB"
     internal = "false"

@@ -1,6 +1,6 @@
 resource "aws_iam_role" "ec2_iam_role" {
   name = "EC2_IAM_role"
-  assume_role_policy = jsonencode({ # Terraforms "jsonencode" function converts a Terraform expression result to valid JSON syntax.
+  assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
@@ -17,11 +17,11 @@ resource "aws_iam_role" "ec2_iam_role" {
     tag-key = "ec2_role"
   }
 } 
-# Defines the IAM policy to allow SSM to be used to manage EC2 instances
+# IAM policy to allow SSM to be used to manage EC2 instances
 resource "aws_iam_policy" "SSM_policy" {
   name        = "SSM_policy"
   description = "Policy allowing access to SSM"
-  policy = jsonencode({ # Terraforms "jsonencode" function converts a Terraform expression result to valid JSON syntax.
+  policy = jsonencode({
     "Version": "2012-10-17",
     "Statement": [
         {
@@ -68,26 +68,33 @@ resource "aws_iam_policy" "SSM_policy" {
     ]
   })
 }
-# Defines the IAM policy to allow S3 to be accessed, need to refine to particular buckets and actions to improve security posture
+# IAM policy to allow S3 bucket hosting website files to be accessed
 resource "aws_iam_policy" "S3_policy" {
   name        = "S3_policy"
-  description = "Policy allowing access to S3"
-
-  policy = jsonencode({ # Terraforms "jsonencode" function converts a Terraform expression result to valid JSON syntax.
+  description = "Allows access to S3 hosting website files"
+  
+  policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Action = [
-          "s3:*",
-        ]
         Effect   = "Allow"
-        Resource = "*"
+        Action = [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:PutObjectAcl",
+                "s3:DeleteObject",
+                "s3:ListBucket"
+        ],
+        Resource = [
+                    "arn:aws:s3:::web-files-2343",
+                    "arn:aws:s3:::web-files-2343/*"
+        ]
       },
     ]
   })
 }
 
-#A ttaches SSM policy to EC2 IAM role
+#Attaches SSM policy to EC2 IAM role
 resource "aws_iam_policy_attachment" "SSM_policy_attachment" {
   name       = "SSM_policy_attachment"
   roles      = [aws_iam_role.ec2_iam_role.name]
@@ -100,7 +107,7 @@ resource "aws_iam_policy_attachment" "S3_policy_attachment" {
   policy_arn = aws_iam_policy.S3_policy.arn
 }
 
-# Assings the predefined ec2 role to the ec2 iam instance profile which is assigned to the web servers
+# Assings the predefined EC2 role to the EC2 IAM instance profile which is assigned to the web server
 resource "aws_iam_instance_profile" "webserver_role" {
   name = "ec2_role_access_s3"
   role = aws_iam_role.ec2_iam_role.name

@@ -52,6 +52,6 @@ resource "aws_autoscaling_policy" "cpu_utilization" {
     predefined_metric_specification {
       predefined_metric_type = "ASGAverageCPUUtilization" # Calculates the average CPU utilization across instances in the ASG
     }
-    target_value = 50 # Specifies desired target CPU utilization percentage
+    target_value = 70 # Specifies desired target CPU utilization percentage
   }
 }
