@@ -13,11 +13,12 @@ While several straightforward methods exist to host a basic static website (e.g.
 
 
 ## Infrastructure Components
-- **AWS EC2 Instances**: Hosting the Apache web servers running on Amazon Linux. 
+- **AWS EC2 Instances**: Hosting the Apache web servers running on Linux (Amazon 2).
+- **Networking**: VPC architecture with segregated public and private subnets, an Internet Gateway for external connectivity, and NAT Gateways allowing secure internet access within the private networks. 
 - **Launch Configuration & Auto Scaling Group**: Utilized for deploying instances and managing scaling based on demand.
 - **S3 Bucket**: Storing the website content files, fetched by instances during launch and copied into the Apache default document root (var/www/html).
 - **Application Load Balancer (ALB)**: Attached to the Target Group of the Web Server instances, distributing incoming traffic efficiently.
-- **Route 53 (R53)**: Creating an A record in the R53 hosted zone for the pre-registered domain name an routing traffic to the load balancer.
+- **Route 53 (R53)**: Creating an Alias record in the Route53 hosted zone for the pre-registered domain name and routing traffic to the load balancer DNS name.
 
 ## Infrastructure Features
 - **Dynamic Scaling**: Auto Scaling Group uses a dynamic scaling policy monitoring CPU utilization to scale web server performance as needed.

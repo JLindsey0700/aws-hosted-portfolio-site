@@ -6,12 +6,12 @@ resource "aws_lb_target_group" "web_server_tg" {
   vpc_id   = aws_vpc.main_vpc.id
   target_type = "instance"
   health_check {
-    interval = 30
+    interval = 90
     path = "/"
     protocol = "HTTP"
-    timeout = "5"
+    timeout = "30"
     healthy_threshold = "4"
-    unhealthy_threshold = "2"   
+    unhealthy_threshold = "3"   
   }
 }
 

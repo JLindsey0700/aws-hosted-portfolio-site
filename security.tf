@@ -1,3 +1,24 @@
+/*
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    security_groups = [aws_security_group.lb_sg.id]
+    #cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow incoming HTTP connections"
+  }  
+  
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    security_groups = [aws_security_group.lb_sg.id, aws_security_group.ssm_endpoint_sg.id]
+    #cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow incoming HTTPS connections"
+  }  
+*/
+
 # Creates Security Group for HTTP, HTTPS ingress traffic to the instances hosting Apache, and allows all egress traffic
 resource "aws_security_group" "web_sg" {
   name        = "Web SG"
@@ -8,7 +29,8 @@ resource "aws_security_group" "web_sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.lb_sg.id]
+    #cidr_blocks = ["0.0.0.0/0"]
     description = "Allow incoming HTTP connections"
   }  
   
@@ -16,7 +38,8 @@ resource "aws_security_group" "web_sg" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.ssm_endpoint_sg.id]
+    #cidr_blocks = ["0.0.0.0/0"]
     description = "Allow incoming HTTPS connections"
   }  
 
@@ -29,13 +52,14 @@ resource "aws_security_group" "web_sg" {
     description = "Allow incoming SSH connections"
   }  
   */
-
+/*
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+*/
 }
 # Creates Security Group for HTTP & HTTPS ingress traffic to the application load balancer, and allows all egress traffic
 resource "aws_security_group" "lb_sg" {
@@ -58,13 +82,14 @@ resource "aws_security_group" "lb_sg" {
     cidr_blocks = ["0.0.0.0/0"]
     description = "Allow incoming HTTPS connections"
   }  
-    
+  /*
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+*/
 }
 
 resource "aws_security_group" "ssm_endpoint_sg" {
